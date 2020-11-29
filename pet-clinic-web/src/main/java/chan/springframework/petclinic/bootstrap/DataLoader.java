@@ -1,10 +1,7 @@
 package chan.springframework.petclinic.bootstrap;
 
 import chan.springframework.petclinic.model.*;
-import chan.springframework.petclinic.services.OwnerService;
-import chan.springframework.petclinic.services.PetTypeService;
-import chan.springframework.petclinic.services.SpecialityService;
-import chan.springframework.petclinic.services.VetService;
+import chan.springframework.petclinic.services.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -17,13 +14,16 @@ public class DataLoader implements CommandLineRunner {
     private final VetService vetService;
     private final PetTypeService petTypeService;
     private final SpecialityService specialityService;
+    private final VisitService visitService; // Referencing them by the interface, so this is going to allow spring to
+    // go ahead and inject it based on the active profile and check in one of the implementations based on the active profile.
 
     // any implementation of this interface that's in the spring context is going to get autowired. '@Autowired' not required
-    public DataLoader(OwnerService ownerService, VetService vetService, PetTypeService petTypeService, SpecialityService specialityService) {
+    public DataLoader(OwnerService ownerService, VetService vetService, PetTypeService petTypeService, SpecialityService specialityService, VisitService visitService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
         this.petTypeService = petTypeService;
         this.specialityService = specialityService;
+        this.visitService = visitService;
     }
 
     @Override
@@ -86,6 +86,13 @@ public class DataLoader implements CommandLineRunner {
         owner2.getPets().add(ubersCat);
 
         ownerService.save(owner2);
+
+        Visit catVisit = new Visit();
+        catVisit.setPet(ubersCat);
+        catVisit.setDate(LocalDate.now());
+        catVisit.setDescription("Jumping cat");
+
+        visitService.save(catVisit);
 
         System.out.println("Loaded Owners...");
 
